@@ -1,0 +1,77 @@
+name: Coverity Scan
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  coverity:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential cmake curl tar \
+            libcurl4-openssl-dev libcjson-dev libmsgpack-dev
+
+      - name: Download Coverity Tool
+        run: |
+          curl -o coverity_tool.tgz \
+            "https://scan.coverity.com/download/linux64?token=${{ secrets.COVERITY_SCAN_TOKEN }}&project=${{ github.repository }}"
+          tar xzf coverity_tool.tgz
+
+      - name: Configure (CMake)
+        run: |
+          mkdir build
+          cd build
+          cmake .. \
+            -DWEBCONFIG_BIN_SUPPORT:BOOL=true \
+            -DWAN_FAILOVER_SUPPORTED:BOOL=true \
+            -DBUILD_GIT:BOOL=true
+
+      - name: Build with Coverity (PR only)
+        if: github.event_name == 'pull_request'
+        run: |
+          export PATH=$(pwd)/cov-analysis-linux64/bin:$PATH
+          cd build
+          cov-build --dir cov-int make -j$(nproc)
+
+      - name: Analyze (PR only)
+        if: github.event_name == 'pull_request'
+        run: |
+          export PATH=$(pwd)/cov-analysis-linux64/bin:$PATH
+          cd build
+          cov-analyze --dir cov-int --all
+
+      - name: Upload results (PR artifact)
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverity-results
+          path: build/cov-int
+
+      - name: Build with Coverity (master upload)
+        if: github.ref == 'refs/heads/master'
+        run: |
+          export PATH=$(pwd)/cov-analysis-linux64/bin:$PATH
+          cd build
+          cov-build --dir cov-int make -j$(nproc)
+
+      - name: Submit to Coverity Scan (master only)
+        if: github.ref == 'refs/heads/master'
+        run: |
+          cd build
+          tar czvf cov-int.tgz cov-int
+
+          curl --form token=${{ secrets.COVERITY_SCAN_TOKEN }} \
+               --form email=${{ secrets.COVERITY_SCAN_EMAIL }} \
+               --form file=@cov-int.tgz \
+               --form version="${{ github.sha }}" \
+               --form description="GitHub Actions build" \
+               https://scan.coverity.com/builds
