@@ -355,6 +355,13 @@ webconfig_db_data_t * get_global_db_node(void)
     return tmp;
 }
 
+void set_global_db_node(webconfig_db_data_t *tmp)
+{
+    pthread_mutex_lock (&webconfig_db_mut);
+    webcfgdb_data = tmp ;
+    pthread_mutex_unlock (&webconfig_db_mut);
+}
+
 webconfig_tmp_data_t * get_global_tmp_node(void)
 {
     webconfig_tmp_data_t * tmp = NULL;
@@ -381,6 +388,10 @@ void set_global_tmp_node(webconfig_tmp_data_t *new)
 int get_numOfMpDocs()
 {
     return numOfMpDocs;
+}
+void set_numOfMpDocs(int num)
+{
+	numOfMpDocs = num;
 }
 
 void reset_numOfMpDocs()
@@ -757,6 +768,10 @@ void delete_tmp_list()
         temp = head;
 	head = head->next;
 	WebcfgDebug("Delete node--> temp->name %s temp->version %lu temp->status %s temp->isSupplementarySync %d temp->error_details %s temp->error_code %lu temp->trans_id %lu temp->retry_count %d temp->cloud_trans_id %s\n",temp->name, (long)temp->version, temp->status, temp->isSupplementarySync, temp->error_details, (long)temp->error_code, (long)temp->trans_id, temp->retry_count, temp->cloud_trans_id);
+	WEBCFG_FREE(temp->name);
+	WEBCFG_FREE(temp->status);
+	WEBCFG_FREE(temp->error_details);
+	WEBCFG_FREE(temp->cloud_trans_id);
 	free(temp);
 	temp = NULL;
     }
@@ -790,7 +805,7 @@ void delete_tmp_docs_list()
 // To release success tmp docs during every maintenance window when few docs are failed in list .
 void release_success_docs_tmplist()
 {
-   webconfig_tmp_data_t *temp = NULL, *next_node;
+   webconfig_tmp_data_t *temp = NULL, *next_node = NULL;
    temp = get_global_tmp_node();
 
     WebcfgDebug("Inside release_success_docs_list()\n");

@@ -23,7 +23,7 @@
 #include "webcfg_log.h"
 #if defined(WEBCONFIG_BIN_SUPPORT)
 #include "webcfg_rbus.h"
-#include <rbus.h>
+#include <rbus/rbus.h>
 #endif
 /*----------------------------------------------------------------------------*/
 /*                                   Macros                                   */
@@ -66,6 +66,16 @@ void __attribute__((weak)) setAttributes(param_t *attArr, const unsigned int par
 int __attribute__((weak)) rbus_GetValueFromDB( char* paramName, char** paramValue);
 int __attribute__((weak)) rbus_StoreValueIntoDB(char *paramName, char *value);
 int __attribute__((weak)) rbus_waitUntilSystemReady();
+#ifdef FEATURE_SUPPORT_MQTTCM
+int __attribute__((weak)) Get_Mqtt_LocationId( char *pString);
+int __attribute__((weak)) Get_Mqtt_NodeId( char *pString);
+int __attribute__((weak)) Get_Mqtt_Broker( char *pString);
+int __attribute__((weak)) Get_Mqtt_Port( char *pString);
+char *__attribute__((weak)) Get_Mqtt_ClientId();
+#endif
+#ifdef _ONESTACK_PRODUCT_REQ_
+char *__attribute__((weak)) getDeviceMode(void);
+#endif
 /*----------------------------------------------------------------------------*/
 /*                             External Functions                             */
 /*----------------------------------------------------------------------------*/
@@ -115,7 +125,7 @@ char *getPartnerID(void)
 
 char *getAccountID(void)
 {
-    char *AI=strdup("unkown");
+    char *AI=strdup("unknown");
     return AI;
 }
 
@@ -157,7 +167,7 @@ char *getFirmwareUpgradeEndTime(void)
 
 char *get_global_systemReadyTime(void)
 {
-    return NULL;
+    return global_systemReadyTime;
 }
 
 void set_global_systemReadyTime(char* systemReadyTime)
@@ -236,8 +246,37 @@ int Set_Supplementary_URL( char *name, char *pString)
     UNUSED(pString);
     return 0;
 }
-
-
+#ifdef FEATURE_SUPPORT_MQTTCM
+int Get_Mqtt_LocationId( char *pString)
+{
+    WebcfgDebug("Inside Get_Mqtt_LocationId weak function.\n");
+    UNUSED(pString);
+    return 0;
+}
+int Get_Mqtt_NodeId( char *pString)
+{
+    WebcfgDebug("Inside Get_Mqtt_NodeId weak function.\n");
+    UNUSED(pString);
+    return 0;
+}
+int Get_Mqtt_Broker( char *pString)
+{
+    WebcfgDebug("Inside Get_Mqtt_Broker weak function.\n");
+    UNUSED(pString);
+    return 0;
+}
+int Get_Mqtt_Port( char *pString)
+{
+    WebcfgDebug("Inside Get_Mqtt_Port weak function.\n");
+    UNUSED(pString);
+    return 0;
+}
+char* Get_Mqtt_ClientId()
+{
+    WebcfgDebug("Inside Get_Mqtt_ClientId weak function.\n");
+    return NULL;
+}
+#endif
 void setValues(const param_t paramVal[], const unsigned int paramCount, const int setType, char *transactionId, money_trace_spans *timeSpan, WDMP_STATUS *retStatus, int *ccspStatus)
 {
 #ifdef WEBCONFIG_BIN_SUPPORT
@@ -380,3 +419,11 @@ int rbus_waitUntilSystemReady()
 	WebcfgDebug("Inside rbus_waitUntilSystemReady weak fn\n");
 	return 0;
 }
+#ifdef _ONESTACK_PRODUCT_REQ_
+char *getDeviceMode(void)
+{
+	WebcfgDebug("Inside getDeviceMode weak fn\n");
+    char *mode=strdup("residential");
+    return mode;
+}
+#endif

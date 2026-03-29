@@ -25,61 +25,9 @@
 #include "../src/webcfg_multipart.h"
 #include "../src/webcfg_timer.h"
 #include "../src/webcfg_notify.h"
+#include "../src/webcfg_generic.h"
 #define UNUSED(x) (void )(x)
 //mock functions
-
-long getTimeOffset()
-{
-	return 0;
-}
-
-bool get_global_shutdown()
-{
-	return false;
-}
-int akerwait__ (unsigned int secs)
-{
-	UNUSED(secs);
-	return 0;
-
-}
-char *getAuthToken()
-{
-	return NULL;
-}
-char* get_deviceMAC()
-{
-	char *device_mac=strdup("b42xxxxxxxxx");
-	return device_mac;
-}
-char* get_deviceWanMAC()
-{
-	char *device_wan_mac=strdup("b42xxxxxxxxx");
-	return device_wan_mac;
-}
-int Get_Webconfig_URL( char *pString)
-{
-	char *webConfigURL =NULL;
-	loadInitURLFromFile(&webConfigURL);
-	pString = webConfigURL;
-        printf("The value of pString is %s\n",pString);
-	return 0;
-}
-int Set_Webconfig_URL( char *pString)
-{
-	printf("Set_Webconfig_URL pString %s\n", pString);
-	return 0;
-}
-
-char * webcfg_appendeddoc(char * subdoc_name, uint32_t version, char * blob_data, size_t blob_size, uint16_t *trans_id)
-{
-	UNUSED(subdoc_name);
-	UNUSED(version);
-	UNUSED(blob_data);
-	UNUSED(blob_size);
-	UNUSED(trans_id);
-	return NULL;
-}
 
 void initEventHandlingTask(){
 	return;
@@ -89,11 +37,6 @@ void processWebcfgEvents(){
 	return;
 }
 
-void webcfgStrncpy(char *destStr, const char *srcStr, size_t destSize)
-{
-    strncpy(destStr, srcStr, destSize-1);
-    destStr[destSize-1] = '\0';
-}
 
 WEBCFG_STATUS checkAndUpdateTmpRetryCount(webconfig_tmp_data_t *temp, char *docname)
 {
@@ -101,173 +44,34 @@ WEBCFG_STATUS checkAndUpdateTmpRetryCount(webconfig_tmp_data_t *temp, char *docn
 	UNUSED(docname);
 	return 0;
 }
-void setValues(const param_t paramVal[], const unsigned int paramCount, const int setType, char *transactionId, money_trace_spans *timeSpan, WDMP_STATUS *retStatus, int *ccspStatus)
+
+void webcfgCallback(char *Info, void* user_data)
 {
-	UNUSED(paramVal);
-	UNUSED(paramCount);
-	UNUSED(setType);
-	UNUSED(transactionId);
-	UNUSED(timeSpan);
-	UNUSED(retStatus);
-	UNUSED(ccspStatus);
-	return;
+	UNUSED(Info);
+	UNUSED(user_data);
 }
-
-
-void sendNotification(char *payload, char *source, char *destination)
+pthread_t get_global_event_threadid()
 {
-	WEBCFG_FREE(payload);
-	WEBCFG_FREE(source);
-	UNUSED(destination);
-	return;
+    return 0;
 }
 
-WDMP_STATUS mapStatus(int ret)
+pthread_t get_global_process_threadid()
 {
-	UNUSED(ret);
-	return 0;
+    return 0;
 }
 
-
-void isSubDocSupported(){
-	return;
-
-}
-
-void checkAkerStatus(){
-	
-	return;
-}
-void updateAkerMaxRetry(webconfig_tmp_data_t *temp, char *docname)
+pthread_cond_t *get_global_event_con(void)
 {
-	UNUSED(temp);
-	UNUSED(docname);
-	return;
+    return 0;
 }
 
-void processAkerSubdoc(){
-return ;
-}
-
-
-char * getsupportedDocs()
+pthread_mutex_t *get_global_event_mut(void)
 {
-	return NULL;
+    return 0;
 }
-char * getsupportedVersion()
-{
-	return NULL;
-}
-
-char * getDeviceBootTime()
-{
-	char *bTime = strdup("152200345");
-	return bTime;
-}
-
-char * getFirmwareVersion()
-{
-	char *fName = strdup("Firmware.bin");
-	return fName;
-}
-
-int getForceSync(char** pString, char **transactionId)
-{
-	UNUSED(pString);
-	UNUSED(transactionId);
-	return 0;
-}
-
-char * getProductClass()
-{
-	char *pClass = strdup("Product");
-	return pClass;
-}
-
-char * getModelName()
-{
-	char *mName = strdup("Model");
-	return mName;
-}
-
 
 void retryMultipartSubdoc(){
 	return ;
-}
-char *get_global_systemReadyTime()
-{
-	char *sTime = strdup("158000123");
-	return sTime;
-}
-
-char * getRebootReason()
-{
-	char *reason = strdup("factory-reset");
-	return reason;
-}
-
-char* get_global_auth_token(){
-	char *tok = strdup("1234567890");
-	return tok ;
-}
-void getCurrent_Time(struct timespec *timer){
-	UNUSED(timer);
-	return;
-}
-
-
-char * getPartnerID()
-{
-	char *pID = strdup("partnerID");
-	return pID;
-}
-
-char * getAccountID()
-{
-	char *aID = strdup("accountID");
-	return aID;
-}
-
-void set_global_supplementarySync(int value)
-{
-    UNUSED(value);
-}
-
-int get_global_supplementarySync()
-{
-	return 0;
-}
-
-
-int Get_Supplementary_URL( char *name, char *pString)
-{
-    UNUSED(name);
-    UNUSED(pString);
-    return 0;
-}
-
-int Set_Supplementary_URL( char *name, char *pString)
-{
-    UNUSED(name);
-    UNUSED(pString);
-    return 0;
-}
-char *getFirmwareUpgradeStartTime(void)
-{
-    return NULL;
-}
-
-char *getFirmwareUpgradeEndTime(void)
-{
-    return NULL;
-}
-char * getsupplementaryDocs()
-{
-      return NULL;
-}
-int generateRandomId()
-{
-	return 0;
 }
 
 /*----------------------------------------------------------------------------*/

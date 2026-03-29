@@ -37,7 +37,12 @@
 
 #define buffLen 1024
 #define maxParamLen 128
-#define NUM_WEBCFG_ELEMENTS 10
+
+#define NUM_WEBCFG_ELEMENTS1 7
+
+#if !defined (FEATURE_SUPPORT_MQTTCM)
+#define NUM_WEBCFG_ELEMENTS2 3
+#endif
 
 #define MAX_FORCE_RESET_SET_COUNT 3
 #define MAX_FORCE_RESET_TIME_SECS 24*60*60
@@ -89,6 +94,12 @@ typedef enum _webcfgError
 
 }webcfgError_t;
 
+typedef struct ForceSyncMsg {
+	char *ForceSyncVal;
+	char *ForceSyncTransID;
+    struct ForceSyncMsg* next;
+} ForceSyncMsg;
+
 bool isRbusEnabled();
 
 bool isRfcEnabled();
@@ -110,6 +121,8 @@ rbusError_t removeRBUSEventElement();
 rbusError_t rbusWebcfgEventHandler(rbusHandle_t handle, rbusProperty_t prop, rbusSetHandlerOptions_t* opts);
 int set_rbus_RfcEnable(bool bValue);
 int set_rbus_ForceSync(char* pString, int *pStatus);
+void set_global_webconfig_url(char *value);
+void set_global_supplementary_url(char *value);
 int parseForceSyncJson(char *jsonpayload, char **forceSyncVal, char **forceSynctransID);
 int get_rbus_ForceSync(char** pString, char **transactionId );
 bool get_rbus_RfcEnable();
@@ -118,7 +131,24 @@ void waitForUpstreamEventSubscribe(int wait_time);
 void trigger_webcfg_forcedsync();
 void registerRbusLogger();
 webcfgError_t fetchMpBlobData(char *docname, void **blobdata, int *len, uint32_t *etag);
+bool isRbusInitialized();
+void webpaRbus_Uninit();
+rbusError_t publishSubdocResetEvent(char *subdocName);
+bool get_global_isRbus(void);
+char * webcfgError_ToString(webcfgError_t e);
+rbusValueType_t mapWdmpToRbusDataType(DATA_TYPE wdmpType);
+int mapRbusToCcspStatus(int Rbus_error_code);
+rbusError_t eventSubHandler(rbusHandle_t handle, rbusEventSubAction_t action, const char* eventName, rbusFilter_t filter, int32_t interval, bool* autoPublish);
+rbusError_t resetEventSubHandler(rbusHandle_t handle, rbusEventSubAction_t action, const char* eventName, rbusFilter_t filter, int32_t interval, bool* autoPublish);
+void rbus_log_handler(rbusLogLevel level, const char* file, int line, int threadId, char* message);
+webcfgError_t checkSubdocInDb(char *docname);
+webcfgError_t resetSubdocVersion(char *docname);
 #ifdef WAN_FAILOVER_SUPPORTED
 int subscribeTo_CurrentActiveInterface_Event();
 #endif
+int addForceSyncMsgToQueue(char *ForceSync, char *ForceSyncTransID);
+int updateForceSyncMsgQueue(char* trans_id);
+void deleteForceSyncMsgQueue();
+void DisplayQueue();
+ForceSyncMsg* getForceSyncMsgQueue();
 #endif

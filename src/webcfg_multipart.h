@@ -17,7 +17,9 @@
 #define REQUEST_H
 
 #include <stdint.h>
+#if !defined FEATURE_SUPPORT_MQTTCM
 #include <curl/curl.h>
+#endif
 #include "webcfg.h"
 #include <wdmp-c.h>
 
@@ -46,16 +48,19 @@ typedef struct multipartdocs
     struct multipartdocs *next;
 } multipartdocs_t;
 
+#ifdef _ONESTACK_PRODUCT_REQ_
+void setDeviceMode(char *mode);
+#endif
+
 int readFromFile(char *filename, char **data, int *len);
 WEBCFG_STATUS parseMultipartDocument(void *config_data, char *ct , size_t data_size, char* trans_uuid);
-void getConfigDocList(char *docList);
-void print_tmp_doc_list(size_t mp_count);
+WEBCFG_STATUS print_tmp_doc_list(size_t mp_count);
 void loadInitURLFromFile(char **url);
 uint32_t get_global_root();
 WEBCFG_STATUS checkRootUpdate();
 WEBCFG_STATUS checkRootDelete();
-void updateRootVersionToDB();
-void deleteRootAndMultipartDocs();
+WEBCFG_STATUS updateRootVersionToDB();
+WEBCFG_STATUS deleteRootAndMultipartDocs();
 char * get_global_transID(void);
 char* generate_trans_uuid();
 void set_global_transID(char *id);
@@ -64,7 +69,7 @@ void set_global_mp(multipartdocs_t *new);
 void reqParam_destroy( int paramCnt, param_t *reqObj );
 void failedDocsRetry();
 WEBCFG_STATUS validate_request_param(param_t *reqParam, int paramCount);
-void refreshConfigVersionList(char *versionsList, int http_status);
+void refreshConfigVersionList(char *versionsList, int http_status, char *docsList);
 char * get_global_contentLen(void);
 void set_global_contentLen(char * value);
 void getRootDocVersionFromDBCache(uint32_t *rt_version, char **rt_string, int *subdoclist);
@@ -74,16 +79,28 @@ int get_global_eventFlag(void);
 void set_global_eventFlag();
 void set_global_ETAG(char *etag);
 char *get_global_ETAG(void);
+void line_parser(char *ptr, int no_of_bytes, char **name_space, uint32_t *etag, char **data, size_t *data_size);
+void subdoc_parser(char *ptr, int no_of_bytes);
+void stripspaces(char *str, char **final_str);
+void get_webCfg_interface(char **interface);
+size_t headr_callback(char *buffer, size_t size, size_t nitems, void* data);
+size_t writer_callback_fn(void *buffer, size_t size, size_t nmemb, void *datain);
+WEBCFG_STATUS processMsgpackSubdoc(char *transaction_id);
+void setForceSyncTransID(char *ForceSyncTransID);
+const char* getForceSyncTransID();
+char* generate_trans_uuid();
 #ifdef WAN_FAILOVER_SUPPORTED
 void set_global_interface(char * value);
 char * get_global_interface(void);
 #endif
-pthread_t get_global_process_threadid();
 void delete_multipart();
 int get_multipartdoc_count();
 WEBCFG_STATUS deleteFromMpList(char* doc_name);
 void addToMpList(uint32_t etag, char *name_space, char *data, size_t data_size);
 void delete_mp_doc();
+#if !defined FEATURE_SUPPORT_MQTTCM
 void createCurlHeader( struct curl_slist *list, struct curl_slist **header_list, int status, char ** trans_uuid);
+#endif
 char *replaceMacWord(const char *s, const char *macW, const char *deviceMACW);
+void checkValidURL(char **s);
 #endif
