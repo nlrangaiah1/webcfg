@@ -23,7 +23,7 @@ jobs:
       - name: Download Coverity Tool
         run: |
           curl -o coverity_tool.tgz \
-            "https://scan.coverity.com/download/linux64?token=${{ secrets.COVERITY_SCAN_TOKEN }}&project=${{ github.repository }}"
+            "https://scan.coverity.com/download/linux64?token=${{ secrets.COVERITY_SCAN_TOKEN }}&project=webcfg"
           tar xzf coverity_tool.tgz
 
       - name: Configure (CMake)
