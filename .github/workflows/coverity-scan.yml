@@ -45,9 +45,10 @@ jobs:
       - name: Analyze (PR only)
         if: github.event_name == 'pull_request'
         run: |
-          export PATH=$(pwd)/cov-analysis-linux64/bin:$PATH
+          export PATH=${GITHUB_WORKSPACE}/cov-analysis-linux64/bin:$PATH
+          
           cd build
-          cov-analyze --dir cov-int --all
+          cov-build --dir cov-int make -j$(nproc)          
 
       - name: Upload results (PR artifact)
         if: github.event_name == 'pull_request'
