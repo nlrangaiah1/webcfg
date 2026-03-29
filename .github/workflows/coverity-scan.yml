@@ -24,7 +24,13 @@ jobs:
         run: |
           curl -o coverity_tool.tgz \
             "https://scan.coverity.com/download/linux64?token=${{ secrets.COVERITY_SCAN_TOKEN }}&project=webcfg"
+              echo "Checking downloaded file..."
+          ls -lh coverity_tool.tgz
+          file coverity_tool.tgz
           tar xzf coverity_tool.tgz
+          pwd
+          echo "After extraction:"
+          ls -l
 
       - name: Configure (CMake)
         run: |
