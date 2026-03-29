@@ -38,7 +38,7 @@ jobs:
       - name: Build with Coverity (PR only)
         if: github.event_name == 'pull_request'
         run: |
-          export PATH=$(pwd)/cov-analysis-linux64/bin:$PATH
+          export PATH=${GITHUB_WORKSPACE}/cov-analysis-linux64/bin:$PATH
           cd build
           cov-build --dir cov-int make -j$(nproc)
 
