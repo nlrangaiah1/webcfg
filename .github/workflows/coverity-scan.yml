@@ -48,7 +48,7 @@ jobs:
         run: |
           export PATH=${GITHUB_WORKSPACE}/cov-analysis-linux64-2024.12.1/bin:$PATH
           cd build
-          cov-build --dir cov-int make -j$(nproc)
+          cov-build --dir cov-int make
 
       - name: Analyze (PR only)
         if: github.event_name == 'pull_request'
