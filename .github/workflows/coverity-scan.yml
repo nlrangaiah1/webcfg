@@ -19,6 +19,8 @@ jobs:
           sudo apt-get install -y \
             build-essential cmake curl tar \
             libcurl4-openssl-dev libcjson-dev libmsgpack-dev
+          sudo apt-get -y install valgrind libcunit1 libcunit1-doc libcunit1-dev libmsgpack-dev gcovr libtool xsltproc docbook-xsl uuid-dev libcurl4-openssl-dev lcov libmsgpack* libcjson-dev build-essential
+              
 
       - name: Download Coverity Tool
         run: |
