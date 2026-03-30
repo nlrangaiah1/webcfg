@@ -34,14 +34,29 @@ jobs:
           echo "After extraction:"
           ls -l
 
-      - name: Configure (CMake)
+      - name: Make Build Directory
+        run: mkdir build
+
+      - name: Get rtrouted  Binary
+        working-directory: build
         run: |
-          mkdir build
-          cd build
+          ../.github/scripts/rtrouted.sh
+          
+      - name: Configure (CMake)
+        working-directory: build      
+        run: |
           cmake .. \
             -DWEBCONFIG_BIN_SUPPORT:BOOL=true \
             -DWAN_FAILOVER_SUPPORTED:BOOL=true \
             -DBUILD_GIT:BOOL=true
+          ps aux 
+          export RBUS_ROOT=${HOME}/rbus
+          export RBUS_INSTALL_DIR=${RBUS_ROOT}/install && \
+          export LD_LIBRARY_PATH=${RBUS_INSTALL_DIR}/usr/lib/rbus_temp_lib:${LD_LIBRARY_PATH}            
+          export C_INCLUDE_PATH=${RBUS_INSTALL_DIR}/usr/include                   
+          mkdir _install
+          mkdir _install/lib
+          cp ${RBUS_INSTALL_DIR}/usr/lib/librbus* _install/lib                 
 
       - name: Build with Coverity (PR only)
         if: github.event_name == 'pull_request'
@@ -58,6 +73,10 @@ jobs:
           cd build
           cov-build --dir cov-int make -j$(nproc)          
 
+      - name: Stop rtrouted
+        run: |
+          killall -9 rtrouted
+          
       - name: Upload results (PR artifact)
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
